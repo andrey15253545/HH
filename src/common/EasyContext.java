@@ -18,7 +18,7 @@ public class EasyContext implements Context {
     private final Map<Class, Object> beanMap = new HashMap<>();
 
     @Override
-    public void addBean(Object bean) {
+    public void addBean(Object bean) { //TODO check who implementation
         Class<?>[] interfaces = bean.getClass().getInterfaces();
         for (Class<?> anInterface : interfaces) {
             Method[] declaredMethods = anInterface.getDeclaredMethods();
@@ -26,7 +26,7 @@ public class EasyContext implements Context {
                 if (declaredMethod.isAnnotationPresent(MicroTransactional.class)) {
                     Object newBean = Proxy.newProxyInstance(
                             EasyContext.class.getClassLoader(),
-                            new Class[]{bean.getClass().getInterfaces()[0]},
+                            new Class[]{anInterface},
                             new TransactionInvocationHandler(bean, transactionProvider)
                     );
                     beanMap.put(anInterface, newBean);
