@@ -1,6 +1,7 @@
-package application.additional.beans;
+package application.additional.beans.impl;
 
 import application.TestOutput;
+import application.additional.beans.WithSameMethodNamesBean;
 
 public class WithSameMethodNamesBeanImpl implements WithSameMethodNamesBean {
 

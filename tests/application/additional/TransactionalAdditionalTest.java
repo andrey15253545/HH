@@ -2,27 +2,43 @@ package application.additional;
 
 import application.TestOutput;
 import application.TestTransactionProvider;
-import application.additional.beans.*;
+import application.additional.beans.MultiImplementedBean;
+import application.additional.beans.MultipleAnnotatedMethodsBean;
+import application.additional.beans.ReturnResultBean;
+import application.additional.beans.WithSameMethodNamesBean;
+import application.additional.beans.impl.MultipleAnnotatedMethodsBeanImpl;
+import application.additional.beans.impl.ReturnResultBeanImpl;
+import application.additional.beans.impl.WithSameMethodNamesBeanImpl;
 import application.beans.AnnotatedWorkerBean;
 import application.beans.NotAnnotatedWorkerBean;
 import common.Context;
 import common.EasyContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class TransactionalAdditionalTest {
 
+    private TestOutput testOutput;
+    private Context context;
+
+
+    @BeforeEach
+    public void before() {
+        testOutput = new TestOutput();
+        context = new EasyContext();
+        context.setTransactionalProvider(new TestTransactionProvider(testOutput));
+    }
+
+
     @Test
     public void multipleInterfaces() {
-        TestOutput testOutput = new TestOutput();
-        Context context = new EasyContext();
-        context.setTransactionalProvider(new TestTransactionProvider(testOutput));
 
         MultiImplementedBean multiImplementedBean = new MultiImplementedBean(testOutput);
-
         context.addBean(multiImplementedBean);
 
         NotAnnotatedWorkerBean notAnnotatedWorkerBeanFromContext = (NotAnnotatedWorkerBean) context.getBean(NotAnnotatedWorkerBean.class);
@@ -38,9 +54,6 @@ public class TransactionalAdditionalTest {
 
     @Test
     public void multipleMethods() {
-        TestOutput testOutput = new TestOutput();
-        Context context = new EasyContext();
-        context.setTransactionalProvider(new TestTransactionProvider(testOutput));
 
         context.addBean(new MultipleAnnotatedMethodsBeanImpl(testOutput));
 
@@ -64,9 +77,6 @@ public class TransactionalAdditionalTest {
 
     @Test
     public void withSameMethodNames() {
-        TestOutput testOutput = new TestOutput();
-        Context context = new EasyContext();
-        context.setTransactionalProvider(new TestTransactionProvider(testOutput));
 
         context.addBean(new WithSameMethodNamesBeanImpl(testOutput));
         WithSameMethodNamesBean withSameMethodNamesBean = (WithSameMethodNamesBean) context.getBean(WithSameMethodNamesBean.class);
@@ -83,7 +93,19 @@ public class TransactionalAdditionalTest {
                         "close transaction"
                 ), testOutput.getRows())
         ;
+    }
 
+    @Test
+    public void ReturnResult() {
+        context.addBean(new ReturnResultBeanImpl());
+        ReturnResultBean returnResultBean = (ReturnResultBean) context.getBean(ReturnResultBean.class);
+        String result = returnResultBean.doWork("very hard");
+        assertEquals(Collections.emptyList(), testOutput.getRows());
+        assertEquals("do very hard work", result);
+
+        int n = returnResultBean.doWork(5);
+        assertEquals(List.of("open transaction", "close transaction"), testOutput.getRows());
+        assertEquals(0, n);
 
     }
 
