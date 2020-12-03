@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Аннотация для запуска транзакции
  */
-@Target(value= ElementType.METHOD)
-@Retention(value= RetentionPolicy.RUNTIME)
+@Target(value = ElementType.METHOD)
+@Retention(value = RetentionPolicy.RUNTIME)
 public @interface MicroTransactional {
 }
