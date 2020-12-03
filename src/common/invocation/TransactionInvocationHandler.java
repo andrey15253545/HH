@@ -5,20 +5,14 @@ import common.TransactionProvider;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TransactionInvocationHandler implements InvocationHandler {
 
     private TransactionProvider transactionProvider;
-    private final Map<String, Method> methods = new HashMap<>();
     private Object target;
 
     public TransactionInvocationHandler(Object target, TransactionProvider transactionProvider) {
         this.target = target;
-        for(Method method: target.getClass().getDeclaredMethods()) {
-            this.methods.put(method.getName(), method);
-        }
         this.transactionProvider = transactionProvider;
     }
 
@@ -26,11 +20,11 @@ public class TransactionInvocationHandler implements InvocationHandler {
     public Object invoke(Object o, Method method, Object[] args) throws Throwable {
         if (method.isAnnotationPresent(MicroTransactional.class)) {
             transactionProvider.open();
-            Object result = methods.get(method.getName()).invoke(target, args);
+            Object result = method.invoke(target, args);
             transactionProvider.close();
             return result;
         }
         else
-            return methods.get(method.getName()).invoke(target, args);
+            return method.invoke(target, args);
     }
 }

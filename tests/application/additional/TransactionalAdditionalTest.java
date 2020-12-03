@@ -2,9 +2,7 @@ package application.additional;
 
 import application.TestOutput;
 import application.TestTransactionProvider;
-import application.additional.beans.MultiImplementedBean;
-import application.additional.beans.MultipleAnnotatedMethodsBean;
-import application.additional.beans.MultipleAnnotatedMethodsBeanImpl;
+import application.additional.beans.*;
 import application.beans.AnnotatedWorkerBean;
 import application.beans.NotAnnotatedWorkerBean;
 import common.Context;
@@ -62,6 +60,31 @@ public class TransactionalAdditionalTest {
                         "close transaction"
                 ), testOutput.getRows())
         ;
+    }
+
+    @Test
+    public void withSameMethodNames() {
+        TestOutput testOutput = new TestOutput();
+        Context context = new EasyContext();
+        context.setTransactionalProvider(new TestTransactionProvider(testOutput));
+
+        context.addBean(new WithSameMethodNamesBeanImpl(testOutput));
+        WithSameMethodNamesBean withSameMethodNamesBean = (WithSameMethodNamesBean) context.getBean(WithSameMethodNamesBean.class);
+        withSameMethodNamesBean.doWork();
+        withSameMethodNamesBean.doWork("additional work");
+
+        assertEquals(
+                List.of(
+                        "open transaction",
+                        "do work",
+                        "close transaction",
+                        "open transaction",
+                        "do work and additional work",
+                        "close transaction"
+                ), testOutput.getRows())
+        ;
+
+
     }
 
 
