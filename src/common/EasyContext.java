@@ -19,24 +19,16 @@ public class EasyContext implements Context {
 
     @Override
     public void addBean(Object bean) { //TODO check who implementation
+        beanMap.put(bean.getClass(), bean);
         Class<?>[] interfaces = bean.getClass().getInterfaces();
         for (Class<?> anInterface : interfaces) {
-            Method[] declaredMethods = anInterface.getDeclaredMethods();
-            for (Method declaredMethod : declaredMethods) {
-                if (declaredMethod.isAnnotationPresent(MicroTransactional.class)) {
-                    Object newBean = Proxy.newProxyInstance(
-                            EasyContext.class.getClassLoader(),
-                            new Class[]{anInterface},
-                            new TransactionInvocationHandler(bean, transactionProvider)
-                    );
-                    beanMap.put(anInterface, newBean);
-                }
-                else {
-                    beanMap.put(anInterface, bean);
-                }
-            }
+            Object newBean = Proxy.newProxyInstance(
+                    EasyContext.class.getClassLoader(),
+                    new Class[]{anInterface},
+                    new TransactionInvocationHandler(bean, transactionProvider)
+            );
+            beanMap.put(anInterface, newBean);
         }
-        beanMap.put(bean.getClass(), bean);
     }
 
     @Override

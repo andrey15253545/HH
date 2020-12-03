@@ -1,5 +1,6 @@
 package common.invocation;
 
+import common.MicroTransactional;
 import common.TransactionProvider;
 
 import java.lang.reflect.InvocationHandler;
@@ -23,9 +24,13 @@ public class TransactionInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object o, Method method, Object[] args) throws Throwable {
-        transactionProvider.open();
-        Object result = methods.get(method.getName()).invoke(target, args);
-        transactionProvider.close();
-        return result;
+        if (method.isAnnotationPresent(MicroTransactional.class)) {
+            transactionProvider.open();
+            Object result = methods.get(method.getName()).invoke(target, args);
+            transactionProvider.close();
+            return result;
+        }
+        else
+            return methods.get(method.getName()).invoke(target, args);
     }
 }
