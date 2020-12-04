@@ -15,12 +15,14 @@ import application.beans.AnnotatedWorkerBeanImpl;
 import application.beans.NotAnnotatedWorkerBean;
 import common.context.Context;
 import common.context.impl.EasyContext;
+import common.exception.InstanceNotExistException;
 import common.transaction.TransactionProvider;
 import common.exception.AdditionSameBeanException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -106,6 +108,8 @@ public class TransactionalAdditionalTest {
         assertEquals(0, n);
     }
 
+
+    //TODO
     @Test
     public void multipleInstance() {
         context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
@@ -113,10 +117,10 @@ public class TransactionalAdditionalTest {
         TransactionProvider secondTransactionProvider = new TestTransactionProvider(secondTestOutput);
         context.setTransactionalProvider(secondTransactionProvider);
 //        context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput));
-        assertThrows(AdditionSameBeanException.class,
-                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput)),
-                "Bean types [interface application.beans.AnnotatedWorkerBean] already exists in context");
-//
+        assertThrows(
+                AdditionSameBeanException.class,
+                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput))
+        );//
 //
 //
 //        Set<AnnotatedWorkerBean> beans = (Set<AnnotatedWorkerBean>) context.getBean(AnnotatedWorkerBean.class);
@@ -127,6 +131,15 @@ public class TransactionalAdditionalTest {
 //        assertEquals(List.of("open transaction", "doWork", "close transaction"), testOutput.getRows());
 //        assertEquals(List.of("open transaction", "do second work", "close transaction"), secondTestOutput.getRows());
 
+    }
+
+    @Test
+    public void nonExistsBean() {
+        context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
+        assertThrows(
+                InstanceNotExistException.class,
+                () -> context.getBean(NotAnnotatedWorkerBean.class)
+        );
     }
 
 }

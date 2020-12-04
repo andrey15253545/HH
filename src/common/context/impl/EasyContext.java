@@ -1,36 +1,33 @@
 package common.context.impl;
 
-import common.exception.InstanceNotExistException;
-import common.transaction.TransactionProvider;
-import common.annotation.MicroTransactional;
 import common.context.Context;
 import common.exception.AdditionSameBeanException;
+import common.exception.InstanceNotExistException;
+import common.storage.Storage;
+import common.storage.impl.EasyStorage;
 import common.transaction.TransactionInvocationHandler;
+import common.transaction.TransactionProvider;
 
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static common.constants.ExceptionMessage.INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE;
 
 /**
  * Context implementation
- * Allows to store only one implementation of a specific type
+ * Allows to store only one implementation of a specific type {@link EasyStorage}
  */
 public class EasyContext implements Context {
 
     private TransactionProvider transactionProvider = null;
 
-    private final Map<Class, Object> beanMap = new HashMap<>();
+    protected Storage storage = new EasyStorage();
 
     /**
      * Adds an object to context
      * If transaction provider {@link TransactionProvider} was sets,
      * creates a new instance of the implemented interfaces
-     * before adding them to bean map {@link EasyContext#beanMap}
-     * In the new instance before calling the method executes opening of transaction
+     * before adding them to the storage {@link Storage#add(Class, Object)}
+     * In the new instance before calling the method executes opening of trwansaction
      * and after the call is executes a closing of transactional {@link TransactionInvocationHandler}
      *
      * @param bean  instance to be added to the context
@@ -42,27 +39,25 @@ public class EasyContext implements Context {
         if (bean == null) {
             throw new IllegalArgumentException(INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE);
         }
-        checkSameBean(bean);
-        beanMap.put(bean.getClass(), bean);
+        this.storage.add(bean.getClass(), bean);
         Class<?>[] interfaces = bean.getClass().getInterfaces();
         for (Class<?> anInterface : interfaces) {
-            if (transactionProvider != null) {
+            if (this.transactionProvider != null) {
                 Object newBean = Proxy.newProxyInstance(
                         EasyContext.class.getClassLoader(),
                         new Class[]{anInterface},
-                        new TransactionInvocationHandler(bean, transactionProvider)
+                        new TransactionInvocationHandler(bean, this.transactionProvider)
                 );
-                beanMap.put(anInterface, newBean);
+                this.storage.add(anInterface, newBean);
             }
             else {
-                beanMap.put(anInterface, bean);
+                this.storage.add(anInterface, bean);
             }
         }
     }
 
     /**
-     * Returns a bean with transactional methods,
-     * if they were annotated {@link MicroTransactional}
+     * Returns a bean from storage {@link Storage}
      *
      * @param beanClass  bean type that will return
      * @return instance of requested type
@@ -70,10 +65,7 @@ public class EasyContext implements Context {
      */
     @Override
     public Object getBean(Class beanClass) {
-        if (!beanMap.containsKey(beanClass)) {
-            throw new InstanceNotExistException(beanClass);
-        }
-        return beanMap.get(beanClass);
+        return this.storage.get(beanClass);
     }
 
     /**
@@ -86,19 +78,5 @@ public class EasyContext implements Context {
         this.transactionProvider = transactionProvider;
     }
 
-    private void checkSameBean(Object bean) {
-        List<Class> existingTypes = new ArrayList<>();
-        if (beanMap.containsKey(bean.getClass())) {
-            existingTypes.add(bean.getClass());
-        }
-        for (Class<?> anInterface : bean.getClass().getInterfaces()) {
-            if (beanMap.containsKey(anInterface)) {
-                existingTypes.add(anInterface);
-            }
-        }
-        if (existingTypes.size() != 0) {
-            throw new AdditionSameBeanException(existingTypes);
-        }
-    }
 
 }
