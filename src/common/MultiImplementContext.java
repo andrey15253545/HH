@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static common.constants.ExceptionMessage.INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE;
+
 /**
  * Имплементация нашего контекста
  * TODO
@@ -20,6 +22,9 @@ public class MultiImplementContext implements Context {
 
     @Override
     public void addBean(Object bean) {
+        if (bean == null) {
+            throw new IllegalArgumentException(INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE);
+        }
         addPairClassImplementation(bean.getClass(), bean);
         for (Class<?> anInterface : bean.getClass().getInterfaces()) {
             Object newBean = Proxy.newProxyInstance(

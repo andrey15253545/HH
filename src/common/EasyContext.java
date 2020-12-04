@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static common.constants.ExceptionMessage.INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE;
+
 /**
  * Имплементация нашего контекста
  * Allows to store only one implementation of a specific type
@@ -21,15 +23,21 @@ public class EasyContext implements Context {
 
     /**
      * Adds an object to context
-     * If transaction provider was sets,
+     * If transaction provider {@link TransactionProvider} was sets,
      * creates a new instance of the implemented interfaces
-     * before adding them to context {@link TransactionProvider}
+     * before adding them to bean map {@link EasyContext#beanMap}
      * In the new instance before calling the method executes opening of transaction
      * and after the call is executes a closing of transactional {@link TransactionInvocationHandler}
-     * @param bean
+     *
+     * @param bean  instance to be added to the context
+     * @throws IllegalArgumentException if the input instance is null
+     * @throws AdditionSameBeanException if an instance of this class or its interfaces already exists
      */
     @Override
     public void addBean(Object bean) {
+        if (bean == null) {
+            throw new IllegalArgumentException(INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE);
+        }
         checkSameBean(bean);
         beanMap.put(bean.getClass(), bean);
         Class<?>[] interfaces = bean.getClass().getInterfaces();
@@ -53,7 +61,7 @@ public class EasyContext implements Context {
      * if they were annotated {@link MicroTransactional}
      *
      * @param beanClass  bean type that will return
-     * @return object of requested type
+     * @return object of requested type or null if it is not present in the context
      */
     @Override
     public Object getBean(Class beanClass) {
