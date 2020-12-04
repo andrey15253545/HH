@@ -15,24 +15,21 @@ import application.beans.AnnotatedWorkerBeanImpl;
 import application.beans.NotAnnotatedWorkerBean;
 import common.context.Context;
 import common.context.impl.EasyContext;
-import common.exception.InstanceNotExistException;
-import common.transaction.TransactionProvider;
 import common.exception.AdditionSameBeanException;
+import common.exception.InstanceNotExistException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TransactionalAdditionalTest {
+public class AdditionalTransactionalTest {
 
     private TestOutput testOutput;
     private Context context;
-
 
     @BeforeEach
     public void before() {
@@ -40,7 +37,6 @@ public class TransactionalAdditionalTest {
         context = new EasyContext();
         context.setTransactionalProvider(new TestTransactionProvider(testOutput));
     }
-
 
     @Test
     public void multipleInterfaces() {
@@ -51,6 +47,7 @@ public class TransactionalAdditionalTest {
         NotAnnotatedWorkerBean notAnnotatedWorkerBeanFromContext = (NotAnnotatedWorkerBean) context.getBean(NotAnnotatedWorkerBean.class);
         AnnotatedWorkerBean annotatedWorkerBeanFromContext = (AnnotatedWorkerBean) context.getBean(AnnotatedWorkerBean.class);
 
+        //checking that transactions are executed only in annotated methods
         annotatedWorkerBeanFromContext.doWork();
         assertEquals(List.of("open transaction", "do some work", "close transaction"), testOutput.getRows());
 
@@ -70,6 +67,7 @@ public class TransactionalAdditionalTest {
         multipleAnnotatedMethodsBean.doOneWork();
         multipleAnnotatedMethodsBean.doTwoWork();
 
+        //checking that transactions are executed on more than one method
         assertEquals(
                 List.of(
                         "open transaction", "do one work", "close transaction",
@@ -85,11 +83,14 @@ public class TransactionalAdditionalTest {
         WithSameMethodNamesBean withSameMethodNamesBean = (WithSameMethodNamesBean) context.getBean(WithSameMethodNamesBean.class);
         withSameMethodNamesBean.doWork();
         withSameMethodNamesBean.doWork("additional work");
+        withSameMethodNamesBean.doWork(15);
 
+        //checks that transactions are executed independently of the method name
         assertEquals(
                 List.of(
                         "open transaction", "do work", "close transaction",
-                        "open transaction", "do work and additional work", "close transaction"
+                        "open transaction", "do work and additional work", "close transaction",
+                        "15"
                 ),
                 testOutput.getRows())
         ;
@@ -99,13 +100,20 @@ public class TransactionalAdditionalTest {
     public void ReturnResult() {
         context.addBean(new ReturnResultBeanImpl());
         ReturnResultBean returnResultBean = (ReturnResultBean) context.getBean(ReturnResultBean.class);
-        String result = returnResultBean.doWork("very hard");
-        assertEquals(Collections.emptyList(), testOutput.getRows());
-        assertEquals("do very hard work", result);
 
-        int n = returnResultBean.doWork(5);
+        String result = returnResultBean.sum("very ", "hard");
+
+        //return result check
+        assertEquals("very hard", result);
+        //checking that transaction were not executed
+        assertEquals(Collections.emptyList(), testOutput.getRows());
+
+        int n = returnResultBean.sum(5, 10);
+
+        //return resu   lt check
+        assertEquals(15, n);
+        //transaction executed check
         assertEquals(List.of("open transaction", "close transaction"), testOutput.getRows());
-        assertEquals(0, n);
     }
 
 
@@ -113,29 +121,20 @@ public class TransactionalAdditionalTest {
     @Test
     public void multipleInstance() {
         context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
-        TestOutput secondTestOutput = new TestOutput();
-        TransactionProvider secondTransactionProvider = new TestTransactionProvider(secondTestOutput);
-        context.setTransactionalProvider(secondTransactionProvider);
-//        context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput));
+
+        //checking that exception was thrown when added two implementation of interface
         assertThrows(
                 AdditionSameBeanException.class,
-                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput))
-        );//
-//
-//
-//        Set<AnnotatedWorkerBean> beans = (Set<AnnotatedWorkerBean>) context.getBean(AnnotatedWorkerBean.class);
-//        assertEquals(2, beans.size());
-//
-//        beans.forEach(AnnotatedWorkerBean::doWork);
-//
-//        assertEquals(List.of("open transaction", "doWork", "close transaction"), testOutput.getRows());
-//        assertEquals(List.of("open transaction", "do second work", "close transaction"), secondTestOutput.getRows());
+                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(this.testOutput))
+        );
 
     }
 
     @Test
     public void nonExistsBean() {
         context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
+
+        //checking that exception was thrown when trying to get a nonexistent bean in the context
         assertThrows(
                 InstanceNotExistException.class,
                 () -> context.getBean(NotAnnotatedWorkerBean.class)

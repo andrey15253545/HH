@@ -5,8 +5,7 @@ import common.annotation.MicroTransactional;
 public interface ReturnResultBean {
 
     @MicroTransactional
-    int doWork(int n);
+    int sum(int x, int y);
 
-    String doWork(String s);
-
+    String sum(String s1, String s2);
 }

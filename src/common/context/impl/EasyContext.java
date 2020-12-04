@@ -1,7 +1,6 @@
 package common.context.impl;
 
 import common.context.Context;
-import common.exception.AdditionSameBeanException;
 import common.exception.InstanceNotExistException;
 import common.storage.Storage;
 import common.storage.impl.EasyStorage;
@@ -32,7 +31,6 @@ public class EasyContext implements Context {
      *
      * @param bean  instance to be added to the context
      * @throws IllegalArgumentException if the input instance is null
-     * @throws AdditionSameBeanException if an instance of this class or its interfaces already exists
      */
     @Override
     public void addBean(Object bean) {

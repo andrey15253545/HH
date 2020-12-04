@@ -10,4 +10,6 @@ public interface WithSameMethodNamesBean {
     @MicroTransactional
     void doWork(String additionalWork);
 
+    void doWork(int x);
+
 }

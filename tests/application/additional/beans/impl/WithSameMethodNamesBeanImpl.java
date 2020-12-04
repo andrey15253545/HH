@@ -20,4 +20,9 @@ public class WithSameMethodNamesBeanImpl implements WithSameMethodNamesBean {
     public void doWork(String additionalWork) {
         testOutput.print("do work and " + additionalWork);
     }
+
+    @Override
+    public void doWork(int x) {
+        testOutput.print(String.valueOf(x));
+    }
 }
