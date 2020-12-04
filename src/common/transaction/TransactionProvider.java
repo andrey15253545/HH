@@ -1,4 +1,4 @@
-package common;
+package common.transaction;
 
 /**
  * Интерфейс для транзакционного механизма

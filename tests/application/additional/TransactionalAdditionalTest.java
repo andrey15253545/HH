@@ -13,17 +13,16 @@ import application.additional.beans.impl.WithSameMethodNamesBeanImpl;
 import application.beans.AnnotatedWorkerBean;
 import application.beans.AnnotatedWorkerBeanImpl;
 import application.beans.NotAnnotatedWorkerBean;
-import common.Context;
-import common.EasyContext;
-import common.TransactionProvider;
+import common.context.Context;
+import common.context.impl.EasyContext;
+import common.transaction.TransactionProvider;
 import common.exception.AdditionSameBeanException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 

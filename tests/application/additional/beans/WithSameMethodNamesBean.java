@@ -1,6 +1,6 @@
 package application.additional.beans;
 
-import common.MicroTransactional;
+import common.annotation.MicroTransactional;
 
 public interface WithSameMethodNamesBean {
 

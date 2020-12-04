@@ -1,4 +1,6 @@
-package common;
+package common.context;
+
+import common.transaction.TransactionProvider;
 
 /**
  * Контекст для нашего мини-спринга

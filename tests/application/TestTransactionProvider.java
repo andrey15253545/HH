@@ -1,6 +1,6 @@
 package application;
 
-import common.TransactionProvider;
+import common.transaction.TransactionProvider;
 
 /**
  * Простейшая имплементация транзакционного механизма

@@ -4,8 +4,8 @@ import application.beans.AnnotatedWorkerBean;
 import application.beans.AnnotatedWorkerBeanImpl;
 import application.beans.NotAnnotatedWorkerBean;
 import application.beans.NotAnnotatedWorkerBeanImpl;
-import common.Context;
-import common.EasyContext;
+import common.context.Context;
+import common.context.impl.EasyContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

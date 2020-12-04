@@ -1,6 +1,6 @@
 package application.beans;
 
-import common.MicroTransactional;
+import common.annotation.MicroTransactional;
 
 public interface AnnotatedWorkerBean {
   @MicroTransactional
