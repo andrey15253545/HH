@@ -1,5 +1,6 @@
 package common.context.impl;
 
+import common.exception.InstanceNotExistException;
 import common.transaction.TransactionProvider;
 import common.context.Context;
 import common.transaction.TransactionInvocationHandler;
@@ -29,19 +30,24 @@ public class MultiImplementContext implements Context {
         }
         addPairClassImplementation(bean.getClass(), bean);
         for (Class<?> anInterface : bean.getClass().getInterfaces()) {
-            Object newBean = Proxy.newProxyInstance(
-                    EasyContext.class.getClassLoader(),
-                    new Class[]{anInterface},
-                    new TransactionInvocationHandler(bean, transactionProvider)
-            );
-            addPairClassImplementation(anInterface, newBean);
+            if (transactionProvider != null) {
+                Object newBean = Proxy.newProxyInstance(
+                        EasyContext.class.getClassLoader(),
+                        new Class[]{anInterface},
+                        new TransactionInvocationHandler(bean, transactionProvider)
+                );
+                addPairClassImplementation(anInterface, newBean);
+            }
+            else {
+                addPairClassImplementation(anInterface, bean);
+            }
         }
     }
 
     @Override
     public Object getBean(Class beanClass) {
         if (!beanMap.containsKey(beanClass)) {
-            return null;
+            throw new InstanceNotExistException(beanClass);
         }
         Set<Object> objects = beanMap.get(beanClass);
         if (objects.size() == 1) {

@@ -1,5 +1,6 @@
 package common.context.impl;
 
+import common.exception.InstanceNotExistException;
 import common.transaction.TransactionProvider;
 import common.annotation.MicroTransactional;
 import common.context.Context;
@@ -15,7 +16,7 @@ import java.util.Map;
 import static common.constants.ExceptionMessage.INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE;
 
 /**
- * Имплементация нашего контекста
+ * Context implementation
  * Allows to store only one implementation of a specific type
  */
 public class EasyContext implements Context {
@@ -64,10 +65,14 @@ public class EasyContext implements Context {
      * if they were annotated {@link MicroTransactional}
      *
      * @param beanClass  bean type that will return
-     * @return object of requested type or null if it is not present in the context
+     * @return instance of requested type
+     * @throws InstanceNotExistException if an instance of requested type was not added
      */
     @Override
     public Object getBean(Class beanClass) {
+        if (!beanMap.containsKey(beanClass)) {
+            throw new InstanceNotExistException(beanClass);
+        }
         return beanMap.get(beanClass);
     }
 
