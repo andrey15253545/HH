@@ -16,9 +16,11 @@ import application.beans.NotAnnotatedWorkerBean;
 import common.Context;
 import common.EasyContext;
 import common.TransactionProvider;
+import common.exception.AdditionSameBeanException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.rules.ExpectedException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -108,21 +110,23 @@ public class TransactionalAdditionalTest {
     @Test
     public void multipleInstance() {
         context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
-
         TestOutput secondTestOutput = new TestOutput();
         TransactionProvider secondTransactionProvider = new TestTransactionProvider(secondTestOutput);
-
         context.setTransactionalProvider(secondTransactionProvider);
-        context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput));
-
-        Set<AnnotatedWorkerBean> beans = (Set<AnnotatedWorkerBean>) context.getBean(AnnotatedWorkerBean.class);
-        assertEquals(2, beans.size());
-
-        beans.forEach(AnnotatedWorkerBean::doWork);
-
-        assertEquals(List.of("open transaction", "doWork", "close transaction"), testOutput.getRows());
-        assertEquals(List.of("open transaction", "do second work", "close transaction"), secondTestOutput.getRows());
-
+//        context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput));
+        assertThrows(AdditionSameBeanException.class,
+                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(secondTestOutput)),
+                "Bean types [interface application.beans.AnnotatedWorkerBean] already exists in context");
+//
+//
+//
+//        Set<AnnotatedWorkerBean> beans = (Set<AnnotatedWorkerBean>) context.getBean(AnnotatedWorkerBean.class);
+//        assertEquals(2, beans.size());
+//
+//        beans.forEach(AnnotatedWorkerBean::doWork);
+//
+//        assertEquals(List.of("open transaction", "doWork", "close transaction"), testOutput.getRows());
+//        assertEquals(List.of("open transaction", "do second work", "close transaction"), secondTestOutput.getRows());
 
     }
 
