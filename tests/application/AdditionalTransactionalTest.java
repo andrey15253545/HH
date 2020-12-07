@@ -1,22 +1,12 @@
-package application.additional;
+package application;
 
-import application.TestOutput;
-import application.TestTransactionProvider;
-import application.additional.beans.MultiImplementedBean;
-import application.additional.beans.MultipleAnnotatedMethodsBean;
-import application.additional.beans.ReturnResultBean;
-import application.additional.beans.WithSameMethodNamesBean;
-import application.additional.beans.impl.DuplicatedAnnotatedWorkerBean;
-import application.additional.beans.impl.MultipleAnnotatedMethodsBeanImpl;
-import application.additional.beans.impl.ReturnResultBeanImpl;
-import application.additional.beans.impl.WithSameMethodNamesBeanImpl;
-import application.beans.AnnotatedWorkerBean;
-import application.beans.AnnotatedWorkerBeanImpl;
-import application.beans.NotAnnotatedWorkerBean;
+import application.beans.*;
+import application.beans.impl.MultiImplementedBean;
+import application.beans.impl.MultipleAnnotatedMethodsBeanImpl;
+import application.beans.impl.ReturnResultBeanImpl;
+import application.beans.impl.WithSameMethodNamesBeanImpl;
 import common.context.Context;
 import common.context.impl.EasyContext;
-import common.exception.AdditionSameBeanException;
-import common.exception.InstanceNotExistException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AdditionalTransactionalTest {
 
@@ -114,31 +103,6 @@ public class AdditionalTransactionalTest {
         assertEquals(15, n);
         //transaction executed check
         assertEquals(List.of("open transaction", "close transaction"), testOutput.getRows());
-    }
-
-
-    //TODO
-    @Test
-    public void multipleInstance() {
-        context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
-
-        //checking that exception was thrown when added two implementation of interface
-        assertThrows(
-                AdditionSameBeanException.class,
-                () -> context.addBean(new DuplicatedAnnotatedWorkerBean(this.testOutput))
-        );
-
-    }
-
-    @Test
-    public void nonExistsBean() {
-        context.addBean(new AnnotatedWorkerBeanImpl(this.testOutput));
-
-        //checking that exception was thrown when trying to get a nonexistent bean in the context
-        assertThrows(
-                InstanceNotExistException.class,
-                () -> context.getBean(NotAnnotatedWorkerBean.class)
-        );
     }
 
 }

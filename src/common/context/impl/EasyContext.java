@@ -26,7 +26,7 @@ public class EasyContext implements Context {
      * If transaction provider {@link TransactionProvider} was sets,
      * creates a new instance of the implemented interfaces
      * before adding them to the storage {@link Storage#add(Class, Object)}
-     * In the new instance before calling the method executes opening of trwansaction
+     * In the new instance before calling the method executes opening of transaction
      * and after the call is executes a closing of transactional {@link TransactionInvocationHandler}
      *
      * @param bean  instance to be added to the context

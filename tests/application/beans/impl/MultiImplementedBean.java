@@ -1,4 +1,4 @@
-package application.additional.beans;
+package application.beans.impl;
 
 import application.TestOutput;
 import application.beans.AnnotatedWorkerBean;

@@ -1,4 +1,4 @@
-package application.additional.beans;
+package application.beans;
 
 import common.annotation.MicroTransactional;
 

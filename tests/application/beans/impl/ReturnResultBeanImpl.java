@@ -1,6 +1,6 @@
-package application.additional.beans.impl;
+package application.beans.impl;
 
-import application.additional.beans.ReturnResultBean;
+import application.beans.ReturnResultBean;
 
 public class ReturnResultBeanImpl implements ReturnResultBean {
 

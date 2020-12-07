@@ -1,6 +1,7 @@
-package application.beans;
+package application.beans.impl;
 
 import application.TestOutput;
+import application.beans.NotAnnotatedWorkerBean;
 
 public class NotAnnotatedWorkerBeanImpl implements NotAnnotatedWorkerBean {
   private final TestOutput output;

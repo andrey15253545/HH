@@ -1,7 +1,7 @@
-package application.additional.beans.impl;
+package application.beans.impl;
 
 import application.TestOutput;
-import application.additional.beans.MultipleAnnotatedMethodsBean;
+import application.beans.MultipleAnnotatedMethodsBean;
 
 public class MultipleAnnotatedMethodsBeanImpl implements MultipleAnnotatedMethodsBean {
 

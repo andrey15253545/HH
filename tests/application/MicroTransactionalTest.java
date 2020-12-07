@@ -1,9 +1,9 @@
 package application;
 
 import application.beans.AnnotatedWorkerBean;
-import application.beans.AnnotatedWorkerBeanImpl;
+import application.beans.impl.AnnotatedWorkerBeanImpl;
 import application.beans.NotAnnotatedWorkerBean;
-import application.beans.NotAnnotatedWorkerBeanImpl;
+import application.beans.impl.NotAnnotatedWorkerBeanImpl;
 import common.context.Context;
 import common.context.impl.EasyContext;
 import org.junit.jupiter.api.Test;

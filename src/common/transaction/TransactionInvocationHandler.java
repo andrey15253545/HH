@@ -23,7 +23,9 @@ public class TransactionInvocationHandler implements InvocationHandler {
     }
 
     /**
-     *
+     * Overrides the method by opening the transaction
+     * before executing the method {@link TransactionProvider#open()}
+     * and closing it after {@link TransactionProvider#close()}
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
