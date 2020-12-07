@@ -7,6 +7,8 @@ import common.storage.Storage;
 import java.util.HashMap;
 import java.util.Map;
 
+import static common.constants.ExceptionMessage.REQUESTED_TYPE_NULL_EXCEPTION_MESSAGE;
+
 /**
  * Allows to store only one implementation of a specific type
  */
@@ -38,9 +40,13 @@ public class EasyStorage implements Storage {
      * @param beanClass type of requested instance
      * @return instance of requested type
      * @throws InstanceNotExistException if requested instance is not exists in the storage
+     * @throws IllegalArgumentException if try to get a bean by null
      */
     @Override
     public Object get(Class beanClass) {
+        if (beanClass == null) {
+            throw new IllegalArgumentException(REQUESTED_TYPE_NULL_EXCEPTION_MESSAGE);
+        }
         if (!beanMap.containsKey(beanClass)) {
             throw new InstanceNotExistException(beanClass);
         }

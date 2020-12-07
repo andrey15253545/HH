@@ -5,7 +5,8 @@ package common.constants;
  */
 public class ExceptionMessage {
 
-    public static final String INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE = "The input instance cannot be null";
+    public static final String INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE = "The input instance must be not null";
+    public static final String REQUESTED_TYPE_NULL_EXCEPTION_MESSAGE = "The type of the requested object must be not null";
     public static final String SAME_BEAN_EXCEPTION_MESSAGE_FORMAT = "Instance type %s already exists in context";
     public static final String INSTANCE_NOT_EXISTS_EXCEPTION_MESSAGE_FORMAT = "Instance types %s not exists in context";
     public static final String TRANSACTION_PROVIDER_NPE_MESSAGE = "transactionalProvider must not be null";
