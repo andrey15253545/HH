@@ -56,4 +56,13 @@ public class AdditionalEasyContextTest {
         );
     }
 
+    @Test
+    public void addNull() {
+        //checking that exception was thrown when trying to get a bean by null
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> context.addBean(null)
+        );
+    }
+
 }

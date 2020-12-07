@@ -7,6 +7,7 @@ import common.storage.Storage;
 import java.util.HashMap;
 import java.util.Map;
 
+import static common.constants.ExceptionMessage.INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE;
 import static common.constants.ExceptionMessage.REQUESTED_TYPE_NULL_EXCEPTION_MESSAGE;
 
 /**
@@ -27,6 +28,9 @@ public class EasyStorage implements Storage {
      */
     @Override
     public void add(Class clazz, Object object) {
+        if (object == null) {
+            throw new IllegalArgumentException(INPUT_INSTANCE_NULL_EXCEPTION_MESSAGE);
+        }
         if (beanMap.containsKey(clazz)) {
             throw new AdditionSameBeanException(clazz);
         }
